@@ -143,14 +143,64 @@
             </div>
         </div>
         <div class="relative group">
-            <div class="absolute -inset-4 bg-gradient-to-br from-[var(--g1)]/20 to-transparent blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-            <div class="relative bg-[var(--border)] aspect-video border border-[var(--border2)] flex items-center justify-center overflow-hidden">
-                 <!-- Placeholder for Diagram/Visual -->
-                 <svg width="200" height="200" viewBox="0 0 24 24" fill="none" stroke="var(--g1)" stroke-width="0.5" class="opacity-20 animate-pulse">
-                    <path d="M20 16V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v16l4-2 4 2 4-2 4 2Z"/>
-                    <path d="M8 10h8M8 14h4"/>
-                 </svg>
-                 <div class="absolute bottom-6 left-6 text-[9px] tracking-[4px] uppercase text-[var(--g1)]">SAP Data Integrity Risk</div>
+            <div class="absolute -inset-4 bg-gradient-to-br from-rose-500/10 to-transparent blur-3xl opacity-50 group-hover:opacity-100 transition-opacity duration-700"></div>
+            <div class="relative bg-[#080814] aspect-video border border-rose-500/20 flex flex-col overflow-hidden group-hover:border-rose-500/40 transition-all">
+                <!-- Header -->
+                <div class="flex items-center justify-between px-4 py-2 border-b border-rose-500/20 bg-rose-500/5">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                        <span class="text-[8px] tracking-[3px] uppercase text-rose-500 font-bold">Integrity_Alert.sys</span>
+                    </div>
+                    <div class="text-[7px] text-rose-500/50 uppercase tracking-widest">Priority: CRITICAL</div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="flex-1 p-6 flex flex-col justify-center">
+                    <!-- Glitchy Data Flow -->
+                    <div class="relative h-20 mb-6 bg-black/40 border border-rose-500/10 overflow-hidden">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <svg width="100%" height="40" viewBox="0 0 300 40" class="text-rose-500/30">
+                                <path d="M0 20 L20 20 L30 5 L40 35 L50 20 L100 20 L110 0 L120 40 L130 20 L200 20 L210 5 L220 35 L230 20 L300 20" fill="none" stroke="currentColor" stroke-width="1">
+                                    <animate attributeName="opacity" values="0.2;0.8;0.2" dur="0.2s" repeatCount="indefinite" />
+                                </path>
+                            </svg>
+                        </div>
+                        <div class="absolute inset-0 flex flex-wrap gap-1 p-2 opacity-10">
+                            <!-- Matrix-like noise -->
+                            <div class="text-[6px] text-rose-500">01010101</div>
+                            <div class="text-[6px] text-rose-500">ERROR_422</div>
+                            <div class="text-[6px] text-rose-500">DROPPED</div>
+                            <div class="text-[6px] text-rose-500">11001010</div>
+                        </div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="bg-rose-500/10 px-4 py-2 border border-rose-500/30 backdrop-blur-sm">
+                                <span class="text-[10px] tracking-[4px] uppercase text-rose-500 font-bold">Data Parity Loss Detected</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Metrics -->
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="border border-rose-500/10 p-2">
+                            <div class="text-[6px] uppercase text-rose-500/50 mb-1">Packet Loss</div>
+                            <div class="text-xs text-rose-500 font-bold">12.4%</div>
+                        </div>
+                        <div class="border border-rose-500/10 p-2">
+                            <div class="text-[6px] uppercase text-rose-500/50 mb-1">Latency</div>
+                            <div class="text-xs text-rose-500 font-bold">1.2s</div>
+                        </div>
+                        <div class="border border-rose-500/10 p-2">
+                            <div class="text-[6px] uppercase text-rose-500/50 mb-1">Human Err</div>
+                            <div class="text-xs text-rose-500 font-bold">HIGH</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Stats -->
+                <div class="px-4 py-2 border-t border-rose-500/20 bg-rose-500/5 flex justify-between items-center">
+                    <div class="text-[7px] text-rose-500/50 uppercase tracking-widest">Scan Status: compromised</div>
+                    <div class="text-[7px] text-rose-500 font-bold animate-pulse">RETRYING...</div>
+                </div>
             </div>
         </div>
       </section>
