@@ -96,9 +96,15 @@
   <body>
     <div class="grain"></div>
 
-    <nav class="fixed top-0 left-0 right-0 z-50 px-6 py-6 lg:px-16 flex items-center justify-between bg-[var(--bg)]/80 backdrop-blur-xl border-bottom border-[var(--border)]">
+    <nav id="nav" class="fixed top-0 left-0 right-0 z-50 px-6 py-6 lg:px-16 flex items-center justify-between bg-[var(--bg)]/80 backdrop-blur-xl border-bottom border-[var(--border)]">
       <a href="index.html" class="font-cormorant text-xl tracking-[8px] uppercase text-[var(--g1)] no-underline">H · H</a>
-      <a href="index.html#projects" class="text-[10px] tracking-[4px] uppercase text-[var(--dim)] hover:text-[var(--w)] transition-colors">← Back to Projects</a>
+      <div class="flex items-center gap-6">
+          <a href="index.html#projects" class="text-[10px] tracking-[4px] uppercase text-[var(--dim)] hover:text-[var(--w)] transition-colors" data-i18n="cs_back">← Back to Projects</a>
+          <div class="nbadge hidden md:flex items-center gap-2 px-4 py-2 border border-green-500/20 rounded-full text-[9px] tracking-[2px] text-green-400">
+            <span class="ndot w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
+            <span data-i18n="available">Available</span>
+          </div>
+      </div>
     </nav>
 
     <main class="pt-32 pb-24 px-6 lg:px-16 max-w-6xl mx-auto">
@@ -106,12 +112,12 @@
       <section class="mb-24">
         <div class="flex items-center gap-3 text-[11px] tracking-[6px] uppercase text-[var(--g1)] mb-8">
             <span class="w-12 h-[1px] bg-[var(--g1)]"></span>
-            Case Study
+            <span data-i18n="cs_tag">Case Study</span>
         </div>
-        <h1 class="font-bebas text-6xl md:text-8xl lg:text-9xl leading-[0.85] mb-8">
+        <h1 class="font-bebas text-6xl md:text-8xl lg:text-9xl leading-[0.85] mb-8" data-i18n="cs_title">
             ZeTheta <span class="text-transparent bg-clip-text bg-gradient-to-r from-[var(--g3)] to-[var(--g1)]">SAP Integration</span>
         </h1>
-        <p class="font-cormorant italic text-2xl md:text-3xl text-[var(--dim)] max-w-3xl leading-relaxed">
+        <p class="font-cormorant italic text-2xl md:text-3xl text-[var(--dim)] max-w-3xl leading-relaxed" data-i18n="cs_hero_desc">
             Bridging the gap between legacy ERP stability and modern analytics agility with zero-loss data synchronization.
         </p>
         
@@ -131,13 +137,13 @@
         <div>
             <div class="relative mb-12">
                 <div class="font-bebas text-[120px] text-[var(--g1)] opacity-[0.05] absolute -top-16 -left-4 pointer-events-none">01</div>
-                <h2 class="font-cormorant text-5xl font-light relative z-10">The <em class="italic text-[var(--g1)]">Challenge</em></h2>
+                <h2 class="font-cormorant text-5xl font-light relative z-10"><span data-i18n="cs_challenge">The</span> <em class="italic text-[var(--g1)]" data-i18n="cs_challenge">Challenge</em></h2>
             </div>
             <div class="space-y-6 text-[var(--dim)] text-lg leading-relaxed">
                 <p>
                     The enterprise faced a critical bottleneck: synchronizing over <strong class="text-[var(--w)]">50 financial fields</strong> from a legacy SAP S/4HANA instance to FinSight Analytics. 
                 </p>
-                <p>
+                <p data-i18n="cs_challenge_p">
                     Manual exports were prone to human error, and existing scripts lacked the resilience to handle ERP maintenance windows or network jitter, risking significant data gaps in financial reporting and compliance audits.
                 </p>
             </div>
@@ -151,7 +157,7 @@
                         <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
                         <span class="text-[8px] tracking-[3px] uppercase text-rose-500 font-bold">Integrity_Alert.sys</span>
                     </div>
-                    <div class="text-[7px] text-rose-500/50 uppercase tracking-widest">Priority: CRITICAL</div>
+                    <div class="text-[7px] text-rose-500/50 uppercase tracking-widest" data-i18n="cs_risk_tag">SAP DATA INTEGRITY RISK</div>
                 </div>
 
                 <!-- Main Content -->
@@ -209,11 +215,11 @@
       <section class="mb-32">
         <div class="relative mb-16">
             <div class="font-bebas text-[120px] text-[var(--g1)] opacity-[0.05] absolute -top-16 -left-4 pointer-events-none">02</div>
-            <h2 class="font-cormorant text-5xl font-light relative z-10">The <em class="italic text-[var(--g1)]">Solution</em></h2>
+            <h2 class="font-cormorant text-5xl font-light relative z-10"><span data-i18n="cs_solution">The</span> <em class="italic text-[var(--g1)]" data-i18n="cs_solution">Solution</em></h2>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
             <div class="lg:col-span-2 space-y-8 text-[var(--dim)] text-lg leading-relaxed">
-                <p>
+                <p data-i18n="cs_solution_p">
                     I architected a middleware solution using <strong class="text-[var(--w)]">Clean Architecture</strong> principles to decouple the SAP source from the analytics destination. This ensures the system remains maintainable even as enterprise APIs evolve.
                 </p>
                 <p>
@@ -282,18 +288,18 @@
 
       <!-- Result -->
       <section class="text-center mb-32">
-        <div class="inline-block px-4 py-1 border border-[var(--g1)] text-[10px] tracking-[4px] uppercase text-[var(--g1)] mb-8">The Result</div>
+        <div class="inline-block px-4 py-1 border border-[var(--g1)] text-[10px] tracking-[4px] uppercase text-[var(--g1)] mb-8" data-i18n="cs_result">The Result</div>
         <div class="flex flex-col md:flex-row justify-center gap-12 lg:gap-24">
             <div>
                 <div class="font-bebas text-7xl md:text-9xl text-[var(--g1)] leading-none">94%</div>
-                <div class="text-[10px] tracking-[4px] uppercase text-[var(--dim)] mt-4">Test Coverage</div>
+                <div class="text-[10px] tracking-[4px] uppercase text-[var(--dim)] mt-4" data-i18n="cs_r1">Test Coverage</div>
             </div>
             <div>
                 <div class="font-bebas text-7xl md:text-9xl text-[var(--g1)] leading-none">100%</div>
-                <div class="text-[10px] tracking-[4px] uppercase text-[var(--dim)] mt-4">Enterprise Compliance</div>
+                <div class="text-[10px] tracking-[4px] uppercase text-[var(--dim)] mt-4" data-i18n="cs_r2">Enterprise Compliance</div>
             </div>
         </div>
-        <p class="mt-16 text-[var(--dim)] text-xl font-cormorant italic max-w-2xl mx-auto">
+        <p class="mt-16 text-[var(--dim)] text-xl font-cormorant italic max-w-2xl mx-auto" data-i18n="cs_quote">
             "The middleware currently handles mission-critical financial streams with zero reported downtime and complete data parity."
         </p>
       </section>
@@ -322,5 +328,7 @@
 
       document.querySelectorAll('.rev').forEach(el => observer.observe(el));
     </script>
+    <script src="translations.js"></script>
+    <script src="function.js"></script>
   </body>
 </html>
