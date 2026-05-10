@@ -1,6 +1,6 @@
 # Hamza Harrass | Professional Portfolio
 
-![Portfolio Preview](assets/img/portfolio-preview.png)
+![Portfolio Logo](logo.svg)
 
 A high-performance, premium portfolio showcasing professional full-stack development and React Native expertise. This project serves as a digital showroom for enterprise-grade solutions and creative web experiences.
 
