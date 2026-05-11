@@ -2158,27 +2158,45 @@
 
               <div class="w-full lg:w-1/3 flex justify-center mt-12 lg:mt-0">
                 <div
-                  class="relative w-48 h-96 md:w-56 md:h-[450px] bg-[#1a1a2e] rounded-[3rem] border-8 border-zinc-800 shadow-2xl overflow-hidden group-hover:scale-105 transition-transform duration-500 ring-1 ring-white/10"
+                  class="relative w-48 h-96 md:w-56 md:h-[450px] bg-[#0f0f1b] rounded-[3rem] border-8 border-zinc-800 shadow-2xl overflow-hidden group-hover:scale-105 transition-transform duration-500 ring-1 ring-white/10"
                 >
+                  <!-- UI Header -->
+                  <div class="absolute top-0 inset-x-0 h-16 bg-gradient-to-b from-black/40 to-transparent z-20 p-6 flex justify-between items-center">
+                    <div class="flex gap-1">
+                      <div class="w-1 h-1 rounded-full bg-rose-400"></div>
+                      <div class="w-1 h-1 rounded-full bg-rose-400/40"></div>
+                    </div>
+                    <div class="w-6 h-6 rounded-full bg-gradient-to-br from-rose-500 to-amber-500"></div>
+                  </div>
+
+                  <!-- Connection Lines -->
+                  <div class="absolute inset-0 z-10 opacity-20">
+                    <svg width="100%" height="100%" viewBox="0 0 100 200" fill="none">
+                      <path d="M20 50 Q 50 100 80 50" stroke="var(--g1)" stroke-width="0.5" stroke-dasharray="2 2" />
+                      <path d="M20 150 Q 50 100 80 150" stroke="var(--g1)" stroke-width="0.5" stroke-dasharray="2 2" />
+                    </svg>
+                  </div>
+
                   <div
-                    class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent flex flex-col justify-end p-8"
+                    class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent flex flex-col justify-end p-8 z-20"
                   >
-                    <div
-                      class="w-12 h-12 bg-[var(--g1)] rounded-full mb-6 animate-pulse opacity-40 shadow-[0_0_20px_var(--g1)]"
-                    ></div>
+                    <div class="flex gap-2 mb-6">
+                      <div class="w-8 h-2 bg-rose-500/40 rounded-full"></div>
+                      <div class="w-4 h-2 bg-rose-500/20 rounded-full"></div>
+                    </div>
                     <div class="h-2 w-3/4 bg-white/20 rounded-full mb-3"></div>
                     <div class="h-2 w-1/2 bg-white/10 rounded-full"></div>
                   </div>
                   <!-- App Icon -->
                   <div
-                    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.07]"
+                    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.15] z-10"
                   >
                     <svg
                       width="120"
                       height="120"
                       viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
+                      fill="var(--g1)"
+                      stroke="var(--g1)"
                       stroke-width="0.5"
                       aria-hidden="true"
                     >
@@ -2507,10 +2525,26 @@
 
               <div class="w-full lg:w-1/3 flex justify-center mt-12 lg:mt-0">
                 <div
-                  class="relative w-48 h-96 md:w-56 md:h-[450px] bg-[#0c1a1a] rounded-[3rem] border-8 border-zinc-800 shadow-2xl overflow-hidden group-hover:scale-105 transition-transform duration-500 ring-1 ring-white/10"
+                  class="relative w-48 h-96 md:w-56 md:h-[450px] bg-[#080f0f] rounded-[3rem] border-8 border-zinc-800 shadow-2xl overflow-hidden group-hover:scale-105 transition-transform duration-500 ring-1 ring-white/10"
                 >
+                  <!-- UI: Fleet Grid -->
+                  <div class="absolute inset-0 p-6 flex flex-col gap-4 opacity-20">
+                    <div class="w-full h-24 bg-[var(--teal)]/10 border border-[var(--teal)]/20 rounded-lg"></div>
+                    <div class="grid grid-cols-2 gap-4">
+                      <div class="h-16 bg-[var(--teal)]/5 border border-[var(--teal)]/10 rounded-lg"></div>
+                      <div class="h-16 bg-[var(--teal)]/5 border border-[var(--teal)]/10 rounded-lg"></div>
+                    </div>
+                    <div class="w-full h-32 bg-[var(--teal)]/5 border border-[var(--teal)]/10 rounded-lg"></div>
+                  </div>
+
+                  <!-- Map Pulse -->
+                  <div class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                    <div class="w-4 h-4 bg-[var(--teal)] rounded-full animate-ping"></div>
+                    <div class="absolute inset-0 w-4 h-4 bg-[var(--teal)] rounded-full"></div>
+                  </div>
+
                   <div
-                    class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent flex flex-col justify-end p-8"
+                    class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent flex flex-col justify-end p-8 z-20"
                   >
                     <div
                       class="w-12 h-12 bg-[var(--teal)] rounded-full mb-6 animate-pulse opacity-40 shadow-[0_0_20px_var(--teal)]"
@@ -2520,18 +2554,216 @@
                   </div>
                   <!-- App Icon -->
                   <div
-                    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.07]"
+                    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.05]"
                   >
                     <svg
                       width="120"
                       height="120"
                       viewBox="0 0 24 24"
                       fill="none"
-                      stroke="currentColor"
+                      stroke="var(--teal)"
                       stroke-width="0.5"
                       aria-hidden="true"
                     >
                       <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><circle cx="7" cy="18" r="2"/><path d="M9 18h6"/><circle cx="17" cy="18" r="2"/><path d="M19 18h2a1 1 0 0 0 1-1v-5l-3-4h-5v10a2 2 0 0 0 2 2z"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- KickOff Card -->
+          <div
+            class="pj-card group relative bg-[#0a0a16] border border-[var(--border)] p-8 lg:p-12 overflow-hidden transition-all duration-500 hover:border-[var(--border2)]"
+          >
+            <div
+              class="absolute top-0 right-0 w-64 h-64 bg-emerald-500 opacity-[0.03] blur-3xl rounded-full -mr-32 -mt-32 transition-all duration-700 group-hover:opacity-[0.07]"
+            ></div>
+
+            <div
+              class="relative z-10 flex flex-col lg:flex-row gap-10 lg:gap-16 items-center lg:items-start"
+            >
+              <div class="flex-1 w-full">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-8">
+                  <div
+                    class="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-xl shadow-emerald/10 flex-shrink-0"
+                  >
+                    <svg
+                      width="28"
+                      height="28"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="white"
+                      stroke-width="2"
+                      role="img"
+                      aria-label="Football icon representing KickOff"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="m12 12 4.3-2.5" />
+                      <path d="m12 12-4.3-2.5" />
+                      <path d="m12 12 0 5" />
+                      <path d="m16.3 9.5 1.7-4.5" />
+                      <path d="m7.7 9.5-1.7-4.5" />
+                      <path d="m12 17 4.5 2" />
+                      <path d="m12 17-4.5 2" />
+                    </svg>
+                  </div>
+                  <div class="flex flex-col gap-1">
+                    <div class="flex items-center gap-3 flex-wrap">
+                      <h3
+                        class="text-3xl md:text-4xl font-bebas tracking-wider text-emerald-400"
+                      >
+                        KickOff
+                      </h3>
+                      <span
+                        class="px-2 py-0.5 text-[8px] tracking-[1px] uppercase border border-emerald-500/30 text-emerald-400 rounded flex items-center gap-1 bg-emerald-500/5"
+                      >
+                        <span class="w-1 h-1 bg-emerald-500 rounded-full animate-pulse"></span>
+                        Live Tracking
+                      </span>
+                    </div>
+                    <p
+                      class="text-[10px] tracking-[4px] uppercase text-[var(--dim)]"
+                    >
+                      Real-time Football Analytics Mobile App
+                    </p>
+                  </div>
+                </div>
+
+                <p
+                  class="text-base md:text-lg leading-relaxed text-[var(--dim)] mb-10 font-cormorant italic" data-i18n="pj_kickoff_desc"
+                >
+                  Comprehensive mobile solution for football enthusiasts providing real-time match data, advanced player metrics, and a seamless live scoring experience.
+                </p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-10 mb-12">
+                  <div>
+                    <h4
+                      class="text-[10px] tracking-[3px] uppercase text-emerald-400 mb-5 flex items-center gap-2"
+                    >
+                      <span class="w-6 h-[1px] bg-emerald-400"></span>
+                      Key Features
+                    </h4>
+                    <ul class="space-y-4 text-[13px] text-[var(--dim)]">
+                      <li class="flex items-center gap-3">
+                        <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full flex-shrink-0"></span>
+                        Live Score Updates (SportMonks API)
+                      </li>
+                      <li class="flex items-center gap-3">
+                        <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full flex-shrink-0"></span>
+                        Detailed Player & Team Statistics
+                      </li>
+                      <li class="flex items-center gap-3">
+                        <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full flex-shrink-0"></span>
+                        Personalized Favorite Match System
+                      </li>
+                      <li class="flex items-center gap-3 text-emerald-400">
+                        <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full flex-shrink-0"></span>
+                        Advanced Search Functionality
+                      </li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4
+                      class="text-[10px] tracking-[3px] uppercase text-emerald-400 mb-5 flex items-center gap-2"
+                    >
+                      <span class="w-6 h-[1px] bg-emerald-400"></span> Infrastructure
+                    </h4>
+                    <ul class="space-y-4 text-[13px] text-[var(--dim)]">
+                      <li class="flex items-center gap-3">
+                        <span class="w-1.5 h-1.5 bg-blue-400 rounded-full flex-shrink-0"></span>
+                        State Management with Redux
+                      </li>
+                      <li class="flex items-center gap-3">
+                        <span class="w-1.5 h-1.5 bg-blue-400 rounded-full flex-shrink-0"></span>
+                        Dockerized Environment
+                      </li>
+                      <li class="flex items-center gap-3">
+                        <span class="w-1.5 h-1.5 bg-blue-400 rounded-full flex-shrink-0"></span>
+                        Automated Testing (Jest)
+                      </li>
+                      <li class="flex items-center gap-3">
+                        <span class="w-1.5 h-1.5 bg-blue-400 rounded-full flex-shrink-0"></span>
+                        Expo Managed Workflow
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="flex flex-wrap gap-2 md:gap-3">
+                  <span
+                    class="px-4 py-1.5 text-[10px] border border-[var(--border)] text-emerald-400 uppercase tracking-wider bg-emerald-500/5"
+                    >React Native</span
+                  >
+                  <span
+                    class="px-4 py-1.5 text-[10px] border border-[var(--border)] text-[var(--dim)] uppercase tracking-wider"
+                    >Redux</span
+                  >
+                  <span
+                    class="px-4 py-1.5 text-[10px] border border-[var(--border)] text-[var(--dim)] uppercase tracking-wider"
+                    >Expo</span
+                  >
+                  <span
+                    class="px-4 py-1.5 text-[10px] border border-[var(--border)] text-[var(--dim)] uppercase tracking-wider"
+                    >Jest</span
+                  >
+                  <span
+                    class="px-4 py-1.5 text-[10px] border border-[var(--border)] text-[var(--dim)] uppercase tracking-wider"
+                    >Docker</span
+                  >
+                </div>
+              </div>
+
+              <div class="w-full lg:w-1/3 flex justify-center mt-12 lg:mt-0">
+                <div
+                  class="relative w-48 h-96 md:w-56 md:h-[450px] bg-[#080d0b] rounded-[3rem] border-8 border-zinc-800 shadow-2xl overflow-hidden group-hover:scale-105 transition-transform duration-500 ring-1 ring-white/10"
+                >
+                  <!-- UI: Football Pitch Pattern -->
+                  <div class="absolute inset-0 opacity-10">
+                    <div class="absolute inset-x-0 top-1/2 h-[1px] bg-emerald-500"></div>
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border border-emerald-500 rounded-full"></div>
+                  </div>
+
+                  <!-- Scoreboard -->
+                  <div class="absolute top-16 inset-x-8 flex items-center justify-center gap-4 z-20">
+                    <div class="flex flex-col items-center gap-1">
+                      <div class="w-6 h-6 rounded bg-white/10 flex items-center justify-center font-bebas text-[10px]">FCB</div>
+                      <div class="font-bebas text-xl">2</div>
+                    </div>
+                    <div class="text-[8px] font-mono opacity-40">74'</div>
+                    <div class="flex flex-col items-center gap-1">
+                      <div class="w-6 h-6 rounded bg-white/10 flex items-center justify-center font-bebas text-[10px]">RMA</div>
+                      <div class="font-bebas text-xl">1</div>
+                    </div>
+                  </div>
+
+                  <div
+                    class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent flex flex-col justify-end p-8 z-20"
+                  >
+                    <div
+                      class="w-12 h-12 bg-emerald-500 rounded-full mb-6 animate-pulse opacity-40 shadow-[0_0_20px_emerald]"
+                    ></div>
+                    <div class="h-2 w-3/4 bg-white/20 rounded-full mb-3"></div>
+                    <div class="h-2 w-1/2 bg-white/10 rounded-full"></div>
+                  </div>
+                  <!-- App Icon -->
+                  <div
+                    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.05]"
+                  >
+                    <svg
+                      width="120"
+                      height="120"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="emerald"
+                      stroke-width="0.5"
+                      aria-hidden="true"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="m12 12 4.3-2.5" />
+                      <path d="m12 12-4.3-2.5" />
+                      <path d="m12 12 0 5" />
                     </svg>
                   </div>
                 </div>
