@@ -81,7 +81,18 @@ window.translations = {
         cs_result: "The Result",
         cs_r1: "Test Coverage",
         cs_r2: "Enterprise Compliance",
-        cs_quote: "The middleware currently handles mission-critical financial streams with zero reported downtime and complete data parity."
+        cs_quote: "The middleware currently handles mission-critical financial streams with zero reported downtime and complete data parity.",
+        pj_portfolio_title: "Portfolio Hub",
+        pj_portfolio_sub: "Professional Showcase Mobile App",
+        pj_portfolio_desc: "Expertly engineered with React Native, this professional portfolio application serves as a high-performance gateway to my mobile development expertise. I prioritized a fluid, native-grade UI/UX by integrating React Navigation for seamless screen transitions and Reanimated for sophisticated micro-interactions, ensuring the interface feels alive and responsive. To guarantee production-level reliability, I implemented rigorous performance optimizations, resulting in a lean, scalable architecture that handles data-heavy components like the interactive project gallery with minimal latency.",
+        pj_portfolio_f1: "Interactive Project Gallery",
+        pj_portfolio_f2: "Professional 'About Me' Section",
+        pj_portfolio_f3: "Integrated Contact Features",
+        pj_portfolio_f4: "Modern Frontend Architecture",
+        pj_portfolio_h1: "React Navigation & Reanimated",
+        pj_portfolio_h2: "Advanced Performance Tuning",
+        pj_portfolio_h3: "Cross-Platform Optimization",
+        pj_portfolio_h4: "Responsive Native UI"
     },
     fr: {
         nav_about: "À Propos",
@@ -165,7 +176,18 @@ window.translations = {
         cs_result: "Le Résultat",
         cs_r1: "Couverture de Tests",
         cs_r2: "Conformité Entreprise",
-        cs_quote: "Le middleware gère actuellement des flux financiers critiques avec un temps d'arrêt nul et une parité totale des données."
+        cs_quote: "Le middleware gère actuellement des flux financiers critiques avec un temps d'arrêt nul et une parité totale des données.",
+        pj_portfolio_title: "Portfolio Hub",
+        pj_portfolio_sub: "Application Mobile Vitrine Professionnelle",
+        pj_portfolio_desc: "Ingénieusement conçue avec React Native, cette application de portfolio professionnel constitue une vitrine haute performance de mon expertise en développement mobile. J'ai privilégié une interface fluide et de qualité native en intégrant React Navigation pour des transitions fluides et Reanimated pour des micro-interactions sophistiquées. Pour garantir une fiabilité de niveau production, j'ai mis en œuvre des optimisations de performance rigoureuses, aboutissant à une architecture légère et évolutive capable de gérer des composants denses comme la galerie de projets interactive avec une latence minimale.",
+        pj_portfolio_f1: "Galerie de Projets Interactive",
+        pj_portfolio_f2: "Section 'À Propos' Professionnelle",
+        pj_portfolio_f3: "Fonctions de Contact Intégrées",
+        pj_portfolio_f4: "Architecture Frontend Moderne",
+        pj_portfolio_h1: "React Navigation & Reanimated",
+        pj_portfolio_h2: "Optimisation des Performances",
+        pj_portfolio_h3: "Optimisation Multi-plateforme",
+        pj_portfolio_h4: "Interface Native Réactive"
     },
     ar: {
         nav_about: "حول",
@@ -249,6 +271,17 @@ window.translations = {
         cs_result: "النتيجة",
         cs_r1: "تغطية الاختبار",
         cs_r2: "الامتثال للمؤسسات",
-        cs_quote: "يعالج البرنامج الوسيط حاليًا التدفقات المالية الهامة مع وقت توقف صفري وتماثل كامل للبيانات."
+        cs_quote: "يعالج البرنامج الوسيط حاليًا التدفقات المالية الهامة مع وقت توقف صفري وتماثل كامل للبيانات.",
+        pj_portfolio_title: "مركز المعرض",
+        pj_portfolio_sub: "تطبيق موبايل احترافي لعرض المشاريع",
+        pj_portfolio_desc: "تم تصميم تطبيق المعرض المهني هذا ببراعة باستخدام React Native، ليكون بوابة عالية الأداء تبرز خبرتي في تطوير تطبيقات الموبايل. لقد منحت الأولوية لتجربة مستخدم سلسة واحترافية من خلال دمج React Navigation للانتقالات السلسة و Reanimated للتفاعلات الدقيقة المتطورة، مما يضمن واجهة حيوية وسريعة الاستجابة. لضمان الموثوقية على مستوى الإنتاج، قمت بتنفيذ تحسينات دقيقة للأداء، مما أدى إلى بنية برمجية خفيفة وقابلة للتطوير تتعامل مع المكونات الغنية بالبيانات مثل معرض المشاريع التفاعلي بأقل وقت استجابة.",
+        pj_portfolio_f1: "معرض مشاريع تفاعلي",
+        pj_portfolio_f2: "قسم 'من أنا' احترافي",
+        pj_portfolio_f3: "ميزات اتصال متكاملة",
+        pj_portfolio_f4: "هيكلية واجهة أمامية حديثة",
+        pj_portfolio_h1: "React Navigation و Reanimated",
+        pj_portfolio_h2: "ضبط متقدم للأداء",
+        pj_portfolio_h3: "تحسين عابر للمنصات",
+        pj_portfolio_h4: "واجهة مستخدم أصلية متجاوبة"
     }
 };
