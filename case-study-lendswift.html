@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LendSwift — Secure Multi-Step Loan Pipeline | Hamza Harrass</title>
+  <meta name="description" content="Case study: LendSwift — an enterprise-grade 8-step loan application wizard with AES-256-GCM client-side encryption, native EMI engine, Aadhaar Verhoeff validation and Canvas image compression. Pure Vanilla JS / ESM." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── Design Tokens (match portfolio) ── */
+    :root {
+      --bg: #06060e;
+      --g1: #c8a951;
+      --g2: #d4b96a;
+      --g3: #b8922e;
+      --teal: #00d4b8;
+      --dim: rgba(255,255,255,.5);
+      --dimmer: rgba(255,255,255,.3);
+      --border: rgba(255,255,255,.07);
+      --border2: rgba(200,169,81,.25);
+      --surface: #0a0a16;
+      --surface2: #0f0f1e;
+      --err: #ef4444;
+      --ok: #22c55e;
+      --warn: #f59e0b;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: #e8e8e8;
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Noise overlay ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: .4;
+    }
+
+    /* ── Type scale ── */
+    .font-bebas { font-family: 'Bebas Neue', sans-serif; }
+    .font-cormorant { font-family: 'Cormorant Garamond', serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+    /* ── Layout ── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+    /* ── Nav ── */
+    .cs-nav {
+      position: sticky; top: 0; z-index: 100;
+      border-bottom: 1px solid var(--border);
+      background: rgba(6,6,14,.85);
+      backdrop-filter: blur(20px);
+    }
+    .cs-nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 24px; max-width: 1100px; margin: 0 auto;
+    }
+    .cs-nav a { text-decoration: none; }
+    .cs-back {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--g1);
+      transition: gap .3s;
+    }
+    .cs-back:hover { gap: 12px; }
+    .cs-back svg { transform: rotate(180deg); }
+    .cs-brand { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 4px; color: var(--g1); }
+
+    /* ── Hero ── */
+    .cs-hero {
+      padding: 100px 0 80px;
+      border-bottom: 1px solid var(--border);
+      position: relative; overflow: hidden;
+    }
+    .cs-hero::after {
+      content: '';
+      position: absolute; top: -200px; right: -200px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(200,169,81,.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cs-hero-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 9px; letter-spacing: 4px; text-transform: uppercase;
+      color: var(--g1); border: 1px solid var(--border2);
+      padding: 6px 14px; border-radius: 2px;
+      margin-bottom: 28px;
+    }
+    .cs-hero-tag span { width: 6px; height: 6px; background: var(--g1); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+    .cs-hero h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(52px, 8vw, 110px);
+      line-height: .95;
+      letter-spacing: 2px;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+    .cs-hero h1 em { color: var(--g1); font-style: normal; }
+    .cs-hero-sub {
+      font-size: 11px; letter-spacing: 5px; text-transform: uppercase;
+      color: var(--dim); margin-bottom: 36px;
+    }
+    .cs-hero-desc {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(18px, 2.4vw, 24px);
+      font-style: italic;
+      color: var(--dim);
+      max-width: 680px;
+      line-height: 1.7;
+      margin-bottom: 48px;
+    }
+    .cs-stats {
+      display: flex; flex-wrap: wrap; gap: 32px;
+      border-top: 1px solid var(--border);
+      padding-top: 40px;
+    }
+    .cs-stat { display: flex; flex-direction: column; gap: 4px; }
+    .cs-stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 40px; color: var(--g1); line-height: 1;
+    }
+    .cs-stat-label { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--dim); }
+
+    /* ── Section headings ── */
+    .cs-section { padding: 80px 0; border-bottom: 1px solid var(--border); }
+    .cs-section:last-child { border-bottom: none; }
+    .cs-section-tag {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 9px; letter-spacing: 4px; text-transform: uppercase;
+      color: var(--g1); margin-bottom: 20px;
+    }
+    .cs-section-tag span { display: block; width: 32px; height: 1px; background: var(--g1); }
+    .cs-section h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(30px, 4vw, 52px);
+      font-weight: 300; line-height: 1.15;
+      color: #fff; margin-bottom: 24px;
+    }
+    .cs-section h2 em { color: var(--g1); font-style: italic; }
+    .cs-section p { font-size: 15px; color: var(--dim); line-height: 1.85; max-width: 720px; }
+
+    /* ── Architecture grid ── */
+    .arch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-top: 48px;
+    }
+    .arch-cell {
+      background: var(--surface);
+      padding: 28px 24px;
+      transition: background .3s;
+    }
+    .arch-cell:hover { background: var(--surface2); }
+    .arch-cell-icon {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--g1), var(--g3));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+    }
+    .arch-cell h3 {
+      font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--g1); margin-bottom: 10px;
+    }
+    .arch-cell p { font-size: 13px; color: var(--dim); line-height: 1.7; max-width: 100%; }
+
+    /* ── Wizard steps ── */
+    .wizard-steps {
+      display: flex; flex-direction: column; gap: 2px;
+      margin-top: 48px;
+    }
+    .wizard-step {
+      display: flex; gap: 20px;
+      padding: 20px 24px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      cursor: default;
+      transition: border-color .3s, background .3s;
+    }
+    .wizard-step:hover { border-color: var(--border2); background: var(--surface2); }
+    .wizard-step-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 32px; color: var(--g1); opacity: .3;
+      line-height: 1; flex-shrink: 0; width: 36px;
+      transition: opacity .3s;
+    }
+    .wizard-step:hover .wizard-step-num { opacity: 1; }
+    .wizard-step-body h3 { font-size: 13px; font-weight: 500; color: #fff; margin-bottom: 4px; }
+    .wizard-step-body p { font-size: 12px; color: var(--dim); }
+    .wizard-step-badge {
+      margin-left: auto; flex-shrink: 0; align-self: flex-start;
+      font-size: 7px; letter-spacing: 2px; text-transform: uppercase;
+      border: 1px solid var(--border2); color: var(--g1);
+      padding: 3px 8px; border-radius: 2px;
+    }
+
+    /* ── Code snippet ── */
+    .code-block {
+      background: #040410;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 32px;
+    }
+    .code-block-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px;
+      background: rgba(255,255,255,.03);
+      border-bottom: 1px solid var(--border);
+    }
+    .code-block-dots { display: flex; gap: 6px; }
+    .code-block-dots span { width: 8px; height: 8px; border-radius: 50%; }
+    .code-block-title { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); }
+    .code-block pre {
+      padding: 24px;
+      font-size: 11.5px;
+      line-height: 1.7;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      color: #c9d1d9;
+    }
+    .tok-k { color: #ff7b72; }
+    .tok-f { color: #d2a8ff; }
+    .tok-s { color: #a5d6ff; }
+    .tok-c { color: rgba(139,148,158,.7); font-style: italic; }
+    .tok-n { color: #ffa657; }
+    .tok-g { color: var(--g1); }
+
+    /* ── Live Wizard ── */
+    #wizard-section { padding: 80px 0; }
+    .wizard-wrapper {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 40px 120px rgba(200,169,81,.05);
+    }
+    .wizard-header {
+      padding: 24px 32px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; flex-wrap: wrap;
+    }
+    .wizard-title { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 3px; color: var(--g1); }
+    .wizard-security {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: #22c55e;
+    }
+    .wizard-security svg { width: 12px; height: 12px; }
+
+    /* Progress bar */
+    .wizard-progress { padding: 16px 32px; border-bottom: 1px solid var(--border); background: rgba(0,0,0,.2); }
+    .progress-track { display: flex; gap: 4px; margin-bottom: 10px; }
+    .progress-seg {
+      flex: 1; height: 3px; border-radius: 2px;
+      background: rgba(255,255,255,.08);
+      transition: background .4s;
+    }
+    .progress-seg.done { background: var(--g1); }
+    .progress-seg.active { background: linear-gradient(90deg, var(--g1), var(--g2)); animation: shimmer 1.5s ease-in-out infinite; }
+    .progress-meta {
+      display: flex; justify-content: space-between;
+      font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim);
+    }
+    .progress-meta strong { color: var(--g1); }
+
+    @keyframes shimmer { 0%,100%{opacity:1} 50%{opacity:.6} }
+
+    /* Wizard body */
+    .wizard-body { padding: 40px 32px; min-height: 380px; }
+    .wizard-step-view { display: none; }
+    .wizard-step-view.active { display: block; animation: fadeUp .35s ease; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+    .ws-title {
+      font-family: 'Bebas Neue', sans-serif; font-size: 28px;
+      letter-spacing: 2px; color: #fff; margin-bottom: 6px;
+    }
+    .ws-sub { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--dim); margin-bottom: 32px; }
+
+    /* Form elements */
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+    .form-field { display: flex; flex-direction: column; gap: 8px; }
+    .form-label {
+      font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--g1);
+    }
+    .form-label span { color: var(--err); margin-left: 2px; }
+    .form-input, .form-select, .form-textarea {
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      color: #e8e8e8;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      padding: 12px 14px;
+      border-radius: 4px;
+      outline: none;
+      transition: border-color .25s, background .25s;
+      width: 100%;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--g1);
+      background: rgba(200,169,81,.04);
+    }
+    .form-input.error { border-color: var(--err); }
+    .form-input.success { border-color: var(--ok); }
+    .form-hint { font-size: 11px; color: var(--dim); }
+    .form-error { font-size: 11px; color: var(--err); display: none; }
+    .form-error.show { display: block; }
+    .form-select option { background: #0f0f1e; }
+    .form-textarea { resize: vertical; min-height: 90px; }
+
+    /* Radio group */
+    .radio-group { display: flex; flex-wrap: wrap; gap: 10px; }
+    .radio-item input { display: none; }
+    .radio-label {
+      display: block; cursor: pointer;
+      padding: 10px 16px;
+      border: 1px solid var(--border);
+      font-size: 12px; letter-spacing: 1px;
+      color: var(--dim);
+      transition: all .25s;
+      border-radius: 4px;
+    }
+    .radio-item input:checked + .radio-label {
+      border-color: var(--g1); color: var(--g1); background: rgba(200,169,81,.07);
+    }
+
+    /* Upload field */
+    .upload-area {
+      border: 2px dashed var(--border);
+      border-radius: 6px; padding: 32px;
+      text-align: center; cursor: pointer;
+      transition: border-color .3s, background .3s;
+      position: relative;
+    }
+    .upload-area:hover { border-color: var(--border2); background: rgba(200,169,81,.03); }
+    .upload-area input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .upload-icon { color: var(--g1); margin-bottom: 10px; }
+    .upload-title { font-size: 13px; color: #fff; margin-bottom: 4px; }
+    .upload-sub { font-size: 11px; color: var(--dim); }
+    .upload-status { margin-top: 12px; font-size: 11px; color: var(--ok); display: none; }
+    .upload-status.show { display: block; }
+
+    /* EMI Widget */
+    .emi-card {
+      background: rgba(200,169,81,.05);
+      border: 1px solid var(--border2);
+      border-radius: 8px; padding: 24px;
+      margin-top: 28px;
+    }
+    .emi-card-label { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--g1); margin-bottom: 16px; }
+    .emi-values {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 20px;
+    }
+    .emi-val { display: flex; flex-direction: column; gap: 4px; }
+    .emi-val-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); }
+    .emi-val-num { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--g1); line-height: 1; }
+    .emi-bar { height: 4px; background: rgba(255,255,255,.08); border-radius: 2px; overflow: hidden; }
+    .emi-bar-fill { height: 100%; background: linear-gradient(90deg, var(--g1), var(--g2)); border-radius: 2px; transition: width .5s ease; }
+    .foir-badge {
+      display: inline-flex; align-items: center; gap: 6px; margin-top: 12px;
+      font-size: 10px; padding: 4px 10px; border-radius: 3px;
+    }
+    .foir-ok { background: rgba(34,197,94,.1); color: #22c55e; border: 1px solid rgba(34,197,94,.2); }
+    .foir-warn { background: rgba(245,158,11,.1); color: #f59e0b; border: 1px solid rgba(245,158,11,.2); }
+    .foir-err { background: rgba(239,68,68,.1); color: #ef4444; border: 1px solid rgba(239,68,68,.2); }
+
+    /* Verhoeff badge */
+    .verhoeff-badge {
+      display: none; margin-top: 8px;
+      font-size: 10px; padding: 4px 10px; border-radius: 3px;
+      align-items: center; gap: 6px;
+    }
+    .verhoeff-badge.show { display: inline-flex; }
+    .verhoeff-ok { background: rgba(34,197,94,.1); color: #22c55e; border: 1px solid rgba(34,197,94,.2); }
+    .verhoeff-err { background: rgba(239,68,68,.1); color: #ef4444; border: 1px solid rgba(239,68,68,.2); }
+
+    /* Summary table */
+    .summary-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    .summary-table td {
+      padding: 10px 0; font-size: 13px;
+      border-bottom: 1px solid var(--border);
+    }
+    .summary-table td:first-child { color: var(--dim); width: 45%; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+    .summary-table td:last-child { color: #fff; font-weight: 500; }
+    .summary-encrypted { font-size: 9px; letter-spacing: 2px; color: var(--ok); display: flex; align-items: center; gap: 6px; margin-top: 20px; }
+
+    /* Wizard footer */
+    .wizard-footer {
+      padding: 20px 32px;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 28px;
+      font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+      border: none; cursor: pointer; border-radius: 4px;
+      transition: all .25s; text-decoration: none;
+    }
+    .btn-ghost {
+      background: transparent; border: 1px solid var(--border); color: var(--dim);
+    }
+    .btn-ghost:hover { border-color: var(--g1); color: var(--g1); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--g1), var(--g3));
+      color: #06060e; font-weight: 600;
+    }
+    .btn-primary:hover { opacity: .88; transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: .35; transform: none; cursor: not-allowed; }
+    .btn-success {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #fff; font-weight: 600;
+    }
+    .btn:disabled { cursor: not-allowed; opacity: .35; }
+
+    /* ── Architecture doc section ── */
+    .tech-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px; margin-top: 40px;
+    }
+    .tech-card {
+      border: 1px solid var(--border); background: var(--surface);
+      padding: 24px; border-radius: 6px;
+      transition: border-color .3s;
+    }
+    .tech-card:hover { border-color: var(--border2); }
+    .tech-card-label { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--g1); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .tech-card-label span { display: block; width: 20px; height: 1px; background: var(--g1); }
+    .tech-card h3 { font-size: 15px; font-weight: 500; color: #fff; margin-bottom: 8px; }
+    .tech-card p { font-size: 12px; color: var(--dim); line-height: 1.7; }
+
+    /* ── Compliance metrics ── */
+    .compliance-row {
+      display: flex; align-items: center; gap: 16px;
+      padding: 16px 0; border-bottom: 1px solid var(--border);
+    }
+    .compliance-row:last-child { border-bottom: none; }
+    .compliance-indicator { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .ci-ok { background: var(--ok); box-shadow: 0 0 8px rgba(34,197,94,.5); }
+    .ci-warn { background: var(--warn); }
+    .compliance-name { font-size: 12px; color: #fff; flex: 1; }
+    .compliance-val { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--g1); }
+
+    /* ── Footer ── */
+    .cs-footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px;
+    }
+    .cs-footer p { font-size: 11px; color: var(--dimmer); }
+    .cs-footer a { color: var(--g1); text-decoration: none; }
+    .cs-footer a:hover { text-decoration: underline; }
+
+    /* ── Responsive ── */
+    @media(max-width:640px) {
+      .wizard-header, .wizard-body, .wizard-footer, .wizard-progress { padding-left: 20px; padding-right: 20px; }
+      .emi-values { grid-template-columns: 1fr 1fr; }
+      .cs-stats { gap: 24px; }
+    }
+
+    /* ── Animations ── */
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+    .rev { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s ease; }
+    .rev.visible { opacity: 1; transform: none; }
+  </style>
+</head>
+<body>
+
+  <!-- ── Navigation ── -->
+  <nav class="cs-nav" aria-label="Case study navigation">
+    <div class="cs-nav-inner">
+      <a href="index.html" class="cs-back" aria-label="Back to portfolio">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+        Portfolio
+      </a>
+      <span class="cs-brand">LENDSWIFT</span>
+    </div>
+  </nav>
+
+  <!-- ── Hero ── -->
+  <header class="cs-hero">
+    <div class="container">
+      <div class="cs-hero-tag rev">
+        <span></span>
+        Frontend Engineering · Case Study
+      </div>
+      <h1 class="rev">Lend<em>Swift</em></h1>
+      <p class="cs-hero-sub rev">Secure Multi-Step Loan Pipeline &amp; Engine</p>
+      <p class="cs-hero-desc rev">
+        Pipeline de demande de crédit enterprise-grade — 8 étapes dynamiques, chiffrement PII
+        AES-256-GCM côté client, moteur EMI mathématique natif avec filtrage FOIR,
+        compression Canvas &lt;2 Mo, validation Aadhaar Verhoeff. Zéro dépendance externe.
+      </p>
+      <div class="cs-stats rev">
+        <div class="cs-stat">
+          <span class="cs-stat-num">8</span>
+          <span class="cs-stat-label">Wizard Steps</span>
+        </div>
+        <div class="cs-stat">
+          <span class="cs-stat-num">256</span>
+          <span class="cs-stat-label">AES Key Bits</span>
+        </div>
+        <div class="cs-stat">
+          <span class="cs-stat-num">0</span>
+          <span class="cs-stat-label">External Deps</span>
+        </div>
+        <div class="cs-stat">
+          <span class="cs-stat-num">&lt;2</span>
+          <span class="cs-stat-label">MB Image Cap</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Overview ── -->
+  <section class="cs-section" aria-labelledby="overview-heading">
+    <div class="container">
+      <div class="cs-section-tag rev"><span></span> Overview</div>
+      <h2 id="overview-heading" class="rev">L'Architecture <em>Complète</em></h2>
+      <p class="rev">
+        LendSwift démontre qu'une interface de demande de crédit peut être à la fois sécurisée,
+        performante et totalement auto-suffisante. Chaque moteur — EMI, chiffrement, compression,
+        validation — est implémenté en Vanilla JS pur avec les API Web natives, sans bundler,
+        sans npm, sans framework. Le résultat : un pipeline de production prêt pour l'entreprise
+        qui tourne dans n'importe quel navigateur moderne.
+      </p>
+
+      <div class="arch-grid">
+        <div class="arch-cell rev">
+          <div class="arch-cell-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+          </div>
+          <h3>Crypto Engine</h3>
+          <p>Chiffrement AES-256-GCM via Web Crypto API. Clé dérivée par PBKDF2, IV aléatoire par session. Les PII ne quittent jamais le navigateur en clair.</p>
+        </div>
+        <div class="arch-cell rev">
+          <div class="arch-cell-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" aria-hidden="true"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <h3>EMI Engine</h3>
+          <p>Formule d'amortissement complet : EMI = P·r·(1+r)ⁿ / ((1+r)ⁿ−1). Filtrage FOIR (≤50 %), tableau d'amortissement complet, intérêts totaux calculés à la volée.</p>
+        </div>
+        <div class="arch-cell rev">
+          <div class="arch-cell-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+          </div>
+          <h3>Canvas Compression</h3>
+          <p>Compression d'images headless via HTMLCanvasElement. Réduction itérative de la qualité JPEG jusqu'à l'atteinte du seuil de 2 Mo, sans upload serveur.</p>
+        </div>
+        <div class="arch-cell rev">
+          <div class="arch-cell-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </div>
+          <h3>Verhoeff Checksum</h3>
+          <p>Implémentation complète des tables de multiplication, de permutation et d'inverse de l'algorithme Verhoeff pour la validation du numéro Aadhaar à 12 chiffres.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 8 Wizard Steps ── -->
+  <section class="cs-section" aria-labelledby="steps-heading">
+    <div class="container">
+      <div class="cs-section-tag rev"><span></span> Pipeline Design</div>
+      <h2 id="steps-heading" class="rev">Les 8 Étapes <em>du Wizard</em></h2>
+      <p class="rev">Chaque étape valide côté client avant autorisation de passage. L'état est sérialisé, chiffré AES-256-GCM et sauvegardé dans localStorage à chaque transition.</p>
+
+      <div class="wizard-steps">
+        <div class="wizard-step rev">
+          <div class="wizard-step-num">01</div>
+          <div class="wizard-step-body">
+            <h3>Informations Personnelles</h3>
+            <p>Nom complet, date de naissance, numéro Aadhaar (validation Verhoeff), PAN, genre. Toute saisie de numéro Aadhaar est immédiatement soumise à la checksum.</p>
+          </div>
+          <div class="wizard-step-badge">Verhoeff</div>
+        </div>
+        <div class="wizard-step rev">
+          <div class="wizard-step-num">02</div>
+          <div class="wizard-step-body">
+            <h3>Coordonnées &amp; Adresse</h3>
+            <p>Email, téléphone (regex E.164), adresse résidentielle, code PIN. Validation HTML5 + patterns JS renforcés.</p>
+          </div>
+          <div class="wizard-step-badge">Validation</div>
+        </div>
+        <div class="wizard-step rev">
+          <div class="wizard-step-num">03</div>
+          <div class="wizard-step-body">
+            <h3>Informations sur l'Emploi</h3>
+            <p>Statut d'emploi, employeur, secteur, ancienneté, revenu mensuel brut. Déclenche le moteur FOIR.</p>
+          </div>
+          <div class="wizard-step-badge">FOIR Engine</div>
+        </div>
+        <div class="wizard-step rev">
+          <div class="wizard-step-num">04</div>
+          <div class="wizard-step-body">
+            <h3>Détails du Prêt &amp; EMI</h3>
+            <p>Montant, durée, taux d'intérêt. Calcul EMI en temps réel avec amortissement complet et avertissement FOIR si le ratio dépasse 50 %.</p>
+          </div>
+          <div class="wizard-step-badge">EMI Live</div>
+        </div>
+        <div class="wizard-step rev">
+          <div class="wizard-step-num">05</div>
+          <div class="wizard-step-body">
+            <h3>Informations Financières</h3>
+            <p>Nom de banque, IFSC (regex format), numéro de compte, type de compte. Déclaration d'engagement de remboursement.</p>
+          </div>
+          <div class="wizard-step-badge">Banking</div>
+        </div>
+        <div class="wizard-step rev">
+          <div class="wizard-step-num">06</div>
+          <div class="wizard-step-body">
+            <h3>Upload de Documents</h3>
+            <p>Photo ID, justificatif de revenu, preuve d'adresse. Chaque fichier est lu via FileReader, compressé si nécessaire via Canvas (JPEG itératif &lt;2 Mo), encodé base64 avant chiffrement.</p>
+          </div>
+          <div class="wizard-step-badge">Canvas</div>
+        </div>
+        <div class="wizard-step rev">
+          <div class="wizard-step-num">07</div>
+          <div class="wizard-step-body">
+            <h3>Références &amp; Garanties</h3>
+            <p>Deux références personnelles avec validation de contact. Informations sur les garanties proposées (optionnel).</p>
+          </div>
+          <div class="wizard-step-badge">References</div>
+        </div>
+        <div class="wizard-step rev">
+          <div class="wizard-step-num">08</div>
+          <div class="wizard-step-body">
+            <h3>Récapitulatif &amp; Soumission</h3>
+            <p>Affichage complet de toutes les données saisies en lecture seule. Consentement légal requis. Déchiffrement à la volée des données PII pour affichage. Soumission finale.</p>
+          </div>
+          <div class="wizard-step-badge">AES Decrypt</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Crypto Code Snippet ── -->
+  <section class="cs-section" aria-labelledby="crypto-heading">
+    <div class="container">
+      <div class="cs-section-tag rev"><span></span> Implementation</div>
+      <h2 id="crypto-heading" class="rev">Moteur <em>Cryptographique</em></h2>
+      <p class="rev">Le module de chiffrement utilise exclusivement les API Web natives — aucun polyfill, aucune bibliothèque externe. La clé est dérivée par PBKDF2 (100 000 itérations, SHA-256) depuis un secret de session et un sel aléatoire.</p>
+
+      <div class="code-block rev">
+        <div class="code-block-header">
+          <div class="code-block-dots">
+            <span style="background:#ef4444;opacity:.6"></span>
+            <span style="background:#f59e0b;opacity:.6"></span>
+            <span style="background:#22c55e;opacity:.6"></span>
+          </div>
+          <span class="code-block-title">crypto-engine.js</span>
+        </div>
+        <pre><code><span class="tok-c">// LendSwift — AES-256-GCM Encryption Engine
+// Powered by the native Web Crypto API</span>
+
+<span class="tok-k">const</span> <span class="tok-n">CryptoEngine</span> = (() =&gt; {
+  <span class="tok-k">const</span> <span class="tok-n">ENC</span> = <span class="tok-k">new</span> <span class="tok-f">TextEncoder</span>();
+  <span class="tok-k">const</span> <span class="tok-n">DEC</span> = <span class="tok-k">new</span> <span class="tok-f">TextDecoder</span>();
+
+  <span class="tok-k">async function</span> <span class="tok-f">deriveKey</span>(secret, salt) {
+    <span class="tok-k">const</span> keyMaterial = <span class="tok-k">await</span> crypto.subtle.<span class="tok-f">importKey</span>(
+      <span class="tok-s">'raw'</span>, <span class="tok-n">ENC</span>.<span class="tok-f">encode</span>(secret),
+      { name: <span class="tok-s">'PBKDF2'</span> }, <span class="tok-k">false</span>, [<span class="tok-s">'deriveKey'</span>]
+    );
+    <span class="tok-k">return</span> crypto.subtle.<span class="tok-f">deriveKey</span>(
+      { name: <span class="tok-s">'PBKDF2'</span>, salt, iterations: <span class="tok-g">100_000</span>, hash: <span class="tok-s">'SHA-256'</span> },
+      keyMaterial,
+      { name: <span class="tok-s">'AES-GCM'</span>, length: <span class="tok-g">256</span> },
+      <span class="tok-k">false</span>, [<span class="tok-s">'encrypt'</span>, <span class="tok-s">'decrypt'</span>]
+    );
+  }
+
+  <span class="tok-k">async function</span> <span class="tok-f">encrypt</span>(plaintext, secret) {
+    <span class="tok-k">const</span> salt = crypto.<span class="tok-f">getRandomValues</span>(<span class="tok-k">new</span> <span class="tok-f">Uint8Array</span>(<span class="tok-g">16</span>));
+    <span class="tok-k">const</span> iv   = crypto.<span class="tok-f">getRandomValues</span>(<span class="tok-k">new</span> <span class="tok-f">Uint8Array</span>(<span class="tok-g">12</span>));
+    <span class="tok-k">const</span> key  = <span class="tok-k">await</span> <span class="tok-f">deriveKey</span>(secret, salt);
+    <span class="tok-k">const</span> ct   = <span class="tok-k">await</span> crypto.subtle.<span class="tok-f">encrypt</span>(
+      { name: <span class="tok-s">'AES-GCM'</span>, iv }, key, <span class="tok-n">ENC</span>.<span class="tok-f">encode</span>(plaintext)
+    );
+    <span class="tok-k">return</span> <span class="tok-f">btoa</span>([...<span class="tok-k">new</span> <span class="tok-f">Uint8Array</span>([...salt, ...iv,
+      ...<span class="tok-k">new</span> <span class="tok-f">Uint8Array</span>(ct)])].map(b =&gt; <span class="tok-f">String</span>.<span class="tok-f">fromCharCode</span>(b)).<span class="tok-f">join</span>(<span class="tok-s">''</span>));
+  }
+
+  <span class="tok-k">return</span> { encrypt };
+})();</code></pre>
+      </div>
+
+      <div class="code-block rev" style="margin-top:16px">
+        <div class="code-block-header">
+          <div class="code-block-dots">
+            <span style="background:#ef4444;opacity:.6"></span>
+            <span style="background:#f59e0b;opacity:.6"></span>
+            <span style="background:#22c55e;opacity:.6"></span>
+          </div>
+          <span class="code-block-title">verhoeff.js — Aadhaar Checksum</span>
+        </div>
+        <pre><code><span class="tok-c">// Verhoeff Algorithm — D5 × D5 → D5
+// mul[i][j] = multiplication table (dihedral group D5)
+// p[i][j]   = permutation table
+// inv[i]    = inverse table</span>
+
+<span class="tok-k">function</span> <span class="tok-f">verhoeffCheck</span>(num) {
+  <span class="tok-k">const</span> d = [[<span class="tok-g">0,1,2,3,4,5,6,7,8,9</span>],
+              [<span class="tok-g">1,2,3,4,0,6,7,8,9,5</span>], <span class="tok-c">/* … */</span>];
+  <span class="tok-k">const</span> p = [[<span class="tok-g">0,1,2,3,4,5,6,7,8,9</span>],
+              [<span class="tok-g">1,5,7,6,2,8,3,0,9,4</span>], <span class="tok-c">/* … */</span>];
+  <span class="tok-k">const</span> inv = [<span class="tok-g">0,4,3,2,1,5,6,7,8,9</span>];
+  <span class="tok-k">let</span> c = <span class="tok-g">0</span>;
+  [...num].<span class="tok-f">reverse</span>().<span class="tok-f">forEach</span>((ch, i) =&gt; {
+    c = d[c][p[i % <span class="tok-g">8</span>][+ch]];
+  });
+  <span class="tok-k">return</span> c === <span class="tok-g">0</span>; <span class="tok-c">// true = valid Aadhaar</span>
+}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── LIVE WIZARD ── -->
+  <section id="wizard-section" aria-labelledby="wizard-heading">
+    <div class="container">
+      <div class="cs-section-tag rev"><span></span> Interactive Demo</div>
+      <h2 id="wizard-heading" style="font-family:'Cormorant Garamond',serif;font-size:clamp(30px,4vw,52px);font-weight:300;color:#fff;margin-bottom:8px;" class="rev">Wizard <em style="color:var(--g1);font-style:italic">Live</em></h2>
+      <p style="font-size:15px;color:var(--dim);margin-bottom:40px;" class="rev">
+        Démonstration interactive du pipeline complet. Les données saisies sont chiffrées AES-256-GCM et stockées dans sessionStorage — rien n'est envoyé à un serveur.
+      </p>
+
+      <div class="wizard-wrapper rev">
+        <!-- Header -->
+        <div class="wizard-header">
+          <span class="wizard-title">LendSwift Application</span>
+          <div class="wizard-security">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+            AES-256-GCM · PII Chiffré
+          </div>
+        </div>
+
+        <!-- Progress -->
+        <div class="wizard-progress">
+          <div class="progress-track" id="progress-track"></div>
+          <div class="progress-meta">
+            <span>Étape <strong id="step-current">1</strong> / <strong>8</strong></span>
+            <span id="step-label-meta">Informations Personnelles</span>
+          </div>
+        </div>
+
+        <!-- Body -->
+        <div class="wizard-body" id="wizard-body">
+
+          <!-- Step 1: Personal Info -->
+          <div class="wizard-step-view active" id="step-view-1">
+            <p class="ws-title">Informations Personnelles</p>
+            <p class="ws-sub">Données soumises à chiffrement AES-256-GCM immédiat</p>
+            <div class="form-grid">
+              <div class="form-field">
+                <label class="form-label" for="ls-fname">Prénom <span>*</span></label>
+                <input id="ls-fname" class="form-input" type="text" placeholder="Hamza" autocomplete="given-name" />
+                <span class="form-error" id="err-fname">Champ requis</span>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="ls-lname">Nom <span>*</span></label>
+                <input id="ls-lname" class="form-input" type="text" placeholder="Harrass" autocomplete="family-name" />
+                <span class="form-error" id="err-lname">Champ requis</span>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="ls-dob">Date de naissance <span>*</span></label>
+                <input id="ls-dob" class="form-input" type="date" />
+                <span class="form-error" id="err-dob">Date requise</span>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="ls-aadhaar">Numéro Aadhaar <span>*</span></label>
+                <input id="ls-aadhaar" class="form-input" type="text" placeholder="4321 4321 4321" maxlength="14" />
+                <div class="verhoeff-badge" id="verhoeff-badge">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                  <span id="verhoeff-text">Validé Verhoeff</span>
+                </div>
+                <span class="form-error" id="err-aadhaar">Numéro Aadhaar invalide</span>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="ls-pan">Numéro PAN <span>*</span></label>
+                <input id="ls-pan" class="form-input" type="text" placeholder="ABCDE1234F" maxlength="10" style="text-transform:uppercase" />
+                <span class="form-error" id="err-pan">Format invalide (ex: ABCDE1234F)</span>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="ls-gender">Genre <span>*</span></label>
+                <select id="ls-gender" class="form-select">
+                  <option value="">Sélectionner</option>
+                  <option>Homme</option>
+                  <option>Femme</option>
+                  <option>Autre</option>
+                </select>
+                <span class="form-error" id="err-gender">Requis</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2: Contact -->
+          <div class="wizard-step-view" id="step-view-2">
+            <p class="ws-title">Coordonnées</p>
+            <p class="ws-sub">Email, téléphone et adresse résidentielle</p>
+            <div class="form-grid">
+              <div class="form-field">
+                <label class="form-label" for="ls-email">Email <span>*</span></label>
+                <input id="ls-email" class="form-input" type="email" placeholder="hamza@example.com" autocomplete="email" />
+                <span class="form-error" id="err-email">Email invalide</span>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="ls-phone">Téléphone <span>*</span></label>
+                <input id="ls-phone" class="form-input" type="tel" placeholder="+212 600 000 000" />
+                <span class="form-error" id="err-phone">Numéro invalide</span>
+              </div>
+              <div class="form-field" style="grid-column:1/-1">
+                <label class="form-label" for="ls-addr">Adresse <span>*</span></label>
+                <input id="ls-addr" class="form-input" type="text" placeholder="123 Rue Mohammed V" />
+                <span class="form-error" id="err-addr">Adresse requise</span>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="ls-city">Ville <span>*</span></label>
+                <input id="ls-city" class="form-input" type="text" placeholder="Meknès" />
+                <span class="form-error" id="err-city">Requis</span>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="ls-pin">Code PIN <span>*</span></label>
+                <input id="ls-pin" class="form-input" type="text" placeholder="50000" maxlength="6" />
+                <span class="form-error" id="err-pin">6 chiffres requis</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3: Employment -->
+          <div class="wizard-step-view" id="step-view-3">
+            <p class="ws-title">Informations sur l'Emploi</p>
+            <p class="ws-sub">Revenu mensuel utilisé par le moteur FOIR</p>
+            <div class="form-grid">
+              <div class="form-field">
+                <label class="form-label" for="ls-emp-status">Statut <span>*</span></label>
+                <select id="ls-emp-status" class="form-select">
+                  <option value="">Sélectionner</option>
+                  <option>Salarié</option>
+                  <option>Indépendant</option>
+                  <option>Chef d'entreprise</option>
+                  <option>Retraité</option>
+                </select>
+                <span class="form-error" id="err-emp-status">Requis</span>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="ls-employer">Employeur / Entreprise <span>*</span></label>
+                <input id="ls-employer" class="form-input" type="text" placeholder="ZeTheta Corp." />
+                <span class="form-error" id="err-employer">Requis</span>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="ls-sector">Secteur <span>*</span></label>
+                <select id="ls-sector" class="form-select">
+                  <option value="">Sélectionner</option>
+                  <option>Technologie</option>
+                  <option>Finance</option>
+                  <option>Santé</option>
+                  <option>Commerce</option>
+                  <option>Industrie</option>
+                  <option>Autre</option>
+                </select>
+                <span class="form-error" id="err-sector">Requis</span>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="ls-income">Revenu mensuel (MAD) <span>*</span></label>
+                <input id="ls-income" class="form-input" type="number" placeholder="15000" min="1000" step="500" oninput="updateEmi()" />
+                <span class="form-error" id="err-income">Revenu requis</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4: Loan + EMI -->
+          <div class="wizard-step-view" id="step-view-4">
+            <p class="ws-title">Détails du Prêt</p>
+            <p class="ws-sub">Le moteur EMI calcule en temps réel</p>
+            <div class="form-grid">
+              <div class="form-field">
+                <label class="form-label" for="ls-amount">Montant demandé (MAD) <span>*</span></label>
+                <input id="ls-amount" class="form-input" type="number" placeholder="150000" min="10000" max="5000000" step="5000" oninput="updateEmi()" />
+                <span class="form-error" id="err-amount">Montant requis</span>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="ls-tenure">Durée (mois) <span>*</span></label>
+                <select id="ls-tenure" class="form-select" onchange="updateEmi()">
+                  <option value="">—</option>
+                  <option value="12">12 mois (1 an)</option>
+                  <option value="24">24 mois (2 ans)</option>
+                  <option value="36">36 mois (3 ans)</option>
+                  <option value="48">48 mois (4 ans)</option>
+                  <option value="60" selected>60 mois (5 ans)</option>
+                  <option value="84">84 mois (7 ans)</option>
+                  <option value="120">120 mois (10 ans)</option>
+                  <option value="180">180 mois (15 ans)</option>
+                  <option value="240">240 mois (20 ans)</option>
+                </select>
+                <span class="form-error" id="err-tenure">Requis</span>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="ls-rate">Taux annuel (%) <span>*</span></label>
+                <input id="ls-rate" class="form-input" type="number" value="9.5" min="1" max="30" step="0.1" oninput="updateEmi()" />
+                <span class="form-error" id="err-rate">Requis</span>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="ls-purpose">Objet du prêt <span>*</span></label>
+                <select id="ls-purpose" class="form-select">
+                  <option value="">Sélectionner</option>
+                  <option>Immobilier</option>
+                  <option>Véhicule</option>
+                  <option>Personnel</option>
+                  <option>Éducation</option>
+                  <option>Entreprise</option>
+                </select>
+                <span class="form-error" id="err-purpose">Requis</span>
+              </div>
+            </div>
+
+            <!-- Live EMI Card -->
+            <div class="emi-card" id="emi-card">
+              <div class="emi-card-label">⚙ EMI ENGINE — Résultat en temps réel</div>
+              <div class="emi-values">
+                <div class="emi-val">
+                  <span class="emi-val-label">Mensualité (EMI)</span>
+                  <span class="emi-val-num" id="emi-result">—</span>
+                </div>
+                <div class="emi-val">
+                  <span class="emi-val-label">Intérêts totaux</span>
+                  <span class="emi-val-num" id="emi-interest" style="font-size:20px;color:var(--dim)">—</span>
+                </div>
+                <div class="emi-val">
+                  <span class="emi-val-label">Coût total</span>
+                  <span class="emi-val-num" id="emi-total" style="font-size:20px;color:var(--dim)">—</span>
+                </div>
+              </div>
+              <div class="emi-bar"><div class="emi-bar-fill" id="emi-bar-fill" style="width:0%"></div></div>
+              <div id="foir-badge" class="foir-badge" style="display:none"></div>
+            </div>
+          </div>
+
+          <!-- Step 5: Banking -->
+          <div class="wizard-step-view" id="step-view-5">
+            <p class="ws-title">Informations Bancaires</p>
+            <p class="ws-sub">Compte de décaissement — chiffré avant stockage</p>
+            <div class="form-grid">
+              <div class="form-field">
+                <label class="form-label" for="ls-bank">Nom de la banque <span>*</span></label>
+                <input id="ls-bank" class="form-input" type="text" placeholder="CIH Bank" />
+                <span class="form-error" id="err-bank">Requis</span>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="ls-ifsc">Code IFSC / RIB <span>*</span></label>
+                <input id="ls-ifsc" class="form-input" type="text" placeholder="CIHB0001234" maxlength="11" style="text-transform:uppercase" />
+                <span class="form-error" id="err-ifsc">Format invalide</span>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="ls-account">Numéro de compte <span>*</span></label>
+                <input id="ls-account" class="form-input" type="text" placeholder="1234567890" />
+                <span class="form-error" id="err-account">Requis (8-18 chiffres)</span>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="ls-acctype">Type de compte <span>*</span></label>
+                <select id="ls-acctype" class="form-select">
+                  <option value="">Sélectionner</option>
+                  <option>Courant</option>
+                  <option>Épargne</option>
+                </select>
+                <span class="form-error" id="err-acctype">Requis</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 6: Documents -->
+          <div class="wizard-step-view" id="step-view-6">
+            <p class="ws-title">Upload de Documents</p>
+            <p class="ws-sub">Compression Canvas automatique si &gt;2 Mo</p>
+            <div style="display:flex;flex-direction:column;gap:24px;">
+              <div>
+                <div class="form-label" style="margin-bottom:12px;">Photo ID <span style="color:var(--err)">*</span></div>
+                <div class="upload-area" id="upload-id">
+                  <input type="file" accept="image/*,.pdf" id="file-id" onchange="handleFileUpload('id',this)" aria-label="Uploader une photo ID" />
+                  <div class="upload-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  </div>
+                  <div class="upload-title">Glisser ou cliquer pour sélectionner</div>
+                  <div class="upload-sub">PNG, JPG, PDF · Max 2 Mo (compression auto)</div>
+                  <div class="upload-status" id="upload-status-id"></div>
+                </div>
+              </div>
+              <div>
+                <div class="form-label" style="margin-bottom:12px;">Justificatif de revenu <span style="color:var(--err)">*</span></div>
+                <div class="upload-area">
+                  <input type="file" accept="image/*,.pdf" id="file-income" onchange="handleFileUpload('income',this)" aria-label="Uploader un justificatif de revenu" />
+                  <div class="upload-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                  </div>
+                  <div class="upload-title">Bulletin de salaire ou avis d'imposition</div>
+                  <div class="upload-sub">PNG, JPG, PDF · Max 2 Mo</div>
+                  <div class="upload-status" id="upload-status-income"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 7: References -->
+          <div class="wizard-step-view" id="step-view-7">
+            <p class="ws-title">Références Personnelles</p>
+            <p class="ws-sub">Deux références requises</p>
+            <div style="display:flex;flex-direction:column;gap:28px;">
+              <div>
+                <div class="form-label" style="margin-bottom:12px;">Référence 1</div>
+                <div class="form-grid">
+                  <div class="form-field">
+                    <label class="form-label" for="ls-ref1name">Nom complet <span>*</span></label>
+                    <input id="ls-ref1name" class="form-input" type="text" placeholder="Mohammed Alami" />
+                    <span class="form-error" id="err-ref1name">Requis</span>
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="ls-ref1rel">Relation <span>*</span></label>
+                    <select id="ls-ref1rel" class="form-select">
+                      <option value="">Sélectionner</option>
+                      <option>Collègue</option>
+                      <option>Ami</option>
+                      <option>Famille</option>
+                    </select>
+                    <span class="form-error" id="err-ref1rel">Requis</span>
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="ls-ref1phone">Téléphone <span>*</span></label>
+                    <input id="ls-ref1phone" class="form-input" type="tel" placeholder="+212 600 111 222" />
+                    <span class="form-error" id="err-ref1phone">Requis</span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div class="form-label" style="margin-bottom:12px;">Référence 2</div>
+                <div class="form-grid">
+                  <div class="form-field">
+                    <label class="form-label" for="ls-ref2name">Nom complet <span>*</span></label>
+                    <input id="ls-ref2name" class="form-input" type="text" placeholder="Fatima Benali" />
+                    <span class="form-error" id="err-ref2name">Requis</span>
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="ls-ref2rel">Relation <span>*</span></label>
+                    <select id="ls-ref2rel" class="form-select">
+                      <option value="">Sélectionner</option>
+                      <option>Collègue</option>
+                      <option>Ami</option>
+                      <option>Famille</option>
+                    </select>
+                    <span class="form-error" id="err-ref2rel">Requis</span>
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="ls-ref2phone">Téléphone <span>*</span></label>
+                    <input id="ls-ref2phone" class="form-input" type="tel" placeholder="+212 600 333 444" />
+                    <span class="form-error" id="err-ref2phone">Requis</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 8: Summary -->
+          <div class="wizard-step-view" id="step-view-8">
+            <p class="ws-title">Récapitulatif &amp; Soumission</p>
+            <p class="ws-sub">Vérification finale avant envoi — données déchiffrées à la volée</p>
+            <table class="summary-table" id="summary-table" aria-label="Récapitulatif de la demande">
+              <tbody id="summary-tbody"></tbody>
+            </table>
+            <div class="form-field" style="margin-top:24px;">
+              <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;">
+                <input type="checkbox" id="ls-consent" style="margin-top:3px;accent-color:var(--g1);" />
+                <span style="font-size:12px;color:var(--dim);line-height:1.6;">
+                  Je certifie que les informations fournies sont exactes et complètes. J'autorise LendSwift à traiter ma demande de crédit conformément aux réglementations en vigueur.
+                </span>
+              </label>
+            </div>
+            <div class="summary-encrypted">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Toutes les PII sont chiffrées AES-256-GCM · Clé dérivée PBKDF2 · IV unique par session
+            </div>
+          </div>
+
+        </div><!-- /wizard-body -->
+
+        <!-- Footer -->
+        <div class="wizard-footer">
+          <button class="btn btn-ghost" id="btn-prev" onclick="wizardPrev()" aria-label="Étape précédente" disabled>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+            Précédent
+          </button>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--g1)" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--dim)">Auto-save chiffré actif</span>
+          </div>
+          <button class="btn btn-primary" id="btn-next" onclick="wizardNext()" aria-label="Étape suivante">
+            Suivant
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Compliance Section ── -->
+  <section class="cs-section" aria-labelledby="compliance-heading">
+    <div class="container">
+      <div class="cs-section-tag rev"><span></span> Compliance</div>
+      <h2 id="compliance-heading" class="rev">Métriques de <em>Conformité</em></h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:40px;" class="rev">
+        <div>
+          <div class="compliance-row">
+            <div class="compliance-indicator ci-ok"></div>
+            <span class="compliance-name">Chiffrement côté client</span>
+            <span class="compliance-val">AES-256-GCM</span>
+          </div>
+          <div class="compliance-row">
+            <div class="compliance-indicator ci-ok"></div>
+            <span class="compliance-name">Dérivation de clé</span>
+            <span class="compliance-val">PBKDF2 100K iter</span>
+          </div>
+          <div class="compliance-row">
+            <div class="compliance-indicator ci-ok"></div>
+            <span class="compliance-name">Validation Aadhaar</span>
+            <span class="compliance-val">Verhoeff D₅</span>
+          </div>
+          <div class="compliance-row">
+            <div class="compliance-indicator ci-ok"></div>
+            <span class="compliance-name">Taille fichier max</span>
+            <span class="compliance-val">&lt; 2 Mo (Canvas)</span>
+          </div>
+        </div>
+        <div>
+          <div class="compliance-row">
+            <div class="compliance-indicator ci-ok"></div>
+            <span class="compliance-name">Ratio FOIR maximal</span>
+            <span class="compliance-val">50 %</span>
+          </div>
+          <div class="compliance-row">
+            <div class="compliance-indicator ci-ok"></div>
+            <span class="compliance-name">Dépendances externes</span>
+            <span class="compliance-val">0 (zéro)</span>
+          </div>
+          <div class="compliance-row">
+            <div class="compliance-indicator ci-ok"></div>
+            <span class="compliance-name">Sauvegarde auto</span>
+            <span class="compliance-val">sessionStorage chiffré</span>
+          </div>
+          <div class="compliance-row">
+            <div class="compliance-indicator ci-ok"></div>
+            <span class="compliance-name">Transmission réseau PII</span>
+            <span class="compliance-val">Aucune (demo)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <div class="container">
+      <div class="cs-footer">
+        <p>LendSwift Case Study · <a href="index.html">Hamza Harrass</a> · Frontend Engineering Portfolio</p>
+        <p style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dimmer);">
+          Vanilla JS ESM · Web Crypto API · HTML5 Canvas · No bundler
+        </p>
+      </div>
+    </div>
+  </footer>
+
+
+  <script type="module">
+    /* ═══════════════════════════════════════════════════
+     * LENDSWIFT — Full Engine Runtime
+     * Modules: Wizard State | Crypto | EMI | Verhoeff | Canvas
+     * ═══════════════════════════════════════════════════ */
+
+    /* ── 1. Verhoeff Algorithm ─────────────────────── */
+    const Verhoeff = (() => {
+      const mul = [
+        [0,1,2,3,4,5,6,7,8,9],[1,2,3,4,0,6,7,8,9,5],
+        [2,3,4,0,1,7,8,9,5,6],[3,4,0,1,2,8,9,5,6,7],
+        [4,0,1,2,3,9,5,6,7,8],[5,9,8,7,6,0,4,3,2,1],
+        [6,5,9,8,7,1,0,4,3,2],[7,6,5,9,8,2,1,0,4,3],
+        [8,7,6,5,9,3,2,1,0,4],[9,8,7,6,5,4,3,2,1,0]
+      ];
+      const perm = [
+        [0,1,2,3,4,5,6,7,8,9],[1,5,7,6,2,8,3,0,9,4],
+        [5,8,0,3,7,9,6,1,4,2],[8,9,1,6,0,4,3,5,2,7],
+        [9,4,5,3,1,2,6,8,7,0],[4,2,8,6,5,7,3,9,0,1],
+        [2,7,9,3,8,0,6,4,1,5],[7,0,4,6,9,1,3,2,5,8]
+      ];
+      const inv = [0,4,3,2,1,5,6,7,8,9];
+      return {
+        validate(num) {
+          const digits = num.replace(/\s/g,'').split('').reverse().map(Number);
+          let c = 0;
+          digits.forEach((d,i) => { c = mul[c][perm[i%8][d]]; });
+          return c === 0;
+        }
+      };
+    })();
+
+    /* ── 2. Crypto Engine (AES-256-GCM) ────────────── */
+    const CryptoEngine = (() => {
+      const ENC = new TextEncoder(), DEC = new TextDecoder();
+      const SESSION_KEY = `ls_sk_${Date.now().toString(36)}`;
+      const SESSION_SECRET = crypto.randomUUID();
+
+      async function deriveKey(secret, salt) {
+        const raw = await crypto.subtle.importKey('raw', ENC.encode(secret), {name:'PBKDF2'}, false, ['deriveKey']);
+        return crypto.subtle.deriveKey(
+          {name:'PBKDF2', salt, iterations:100_000, hash:'SHA-256'},
+          raw, {name:'AES-GCM', length:256}, false, ['encrypt','decrypt']
+        );
+      }
+      async function encrypt(plaintext) {
+        const salt = crypto.getRandomValues(new Uint8Array(16));
+        const iv   = crypto.getRandomValues(new Uint8Array(12));
+        const key  = await deriveKey(SESSION_SECRET, salt);
+        const ct   = await crypto.subtle.encrypt({name:'AES-GCM',iv}, key, ENC.encode(plaintext));
+        const buf  = new Uint8Array(salt.byteLength + iv.byteLength + ct.byteLength);
+        buf.set(salt, 0); buf.set(iv, salt.byteLength); buf.set(new Uint8Array(ct), salt.byteLength + iv.byteLength);
+        return btoa(String.fromCharCode(...buf));
+      }
+      async function decrypt(b64) {
+        const buf  = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+        const salt = buf.slice(0,16), iv = buf.slice(16,28), ct = buf.slice(28);
+        const key  = await deriveKey(SESSION_SECRET, salt);
+        const pt   = await crypto.subtle.decrypt({name:'AES-GCM',iv}, key, ct);
+        return DEC.decode(pt);
+      }
+      return { encrypt, decrypt };
+    })();
+
+    /* ── 3. Canvas Image Compression ───────────────── */
+    async function compressImage(file, maxBytes = 2 * 1024 * 1024) {
+      if (file.type === 'application/pdf') return file;
+      return new Promise(resolve => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const scale  = Math.min(1, 1200 / Math.max(img.width, img.height));
+          canvas.width  = img.width  * scale;
+          canvas.height = img.height * scale;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          URL.revokeObjectURL(url);
+          let quality = 0.9;
+          const tryCompress = () => {
+            canvas.toBlob(blob => {
+              if (!blob) return resolve(file);
+              if (blob.size <= maxBytes || quality <= 0.1) return resolve(blob);
+              quality = Math.max(0.1, quality - 0.1);
+              tryCompress();
+            }, 'image/jpeg', quality);
+          };
+          tryCompress();
+        };
+        img.src = url;
+      });
+    }
+
+    /* ── 4. EMI Engine ─────────────────────────────── */
+    const EMI = {
+      calc(principal, annualRate, months) {
+        if (!principal || !annualRate || !months) return null;
+        const r = (annualRate / 100) / 12;
+        const n = months;
+        const emi = r === 0 ? principal / n : principal * r * Math.pow(1+r,n) / (Math.pow(1+r,n) - 1);
+        const total    = emi * n;
+        const interest = total - principal;
+        return { emi: Math.round(emi), interest: Math.round(interest), total: Math.round(total) };
+      },
+      foirStatus(emi, income) {
+        if (!emi || !income) return null;
+        const ratio = emi / income;
+        if (ratio <= 0.35) return { ratio, level:'ok',  label:`FOIR ${(ratio*100).toFixed(1)}% — Excellent` };
+        if (ratio <= 0.50) return { ratio, level:'warn', label:`FOIR ${(ratio*100).toFixed(1)}% — Limite acceptable` };
+        return { ratio, level:'err', label:`FOIR ${(ratio*100).toFixed(1)}% — Dépasse 50% (refus probable)` };
+      }
+    };
+
+    /* ── 5. Wizard State ────────────────────────────── */
+    const STEPS = 8;
+    let currentStep = 1;
+    const formData = {};
+
+    const STEP_LABELS = [
+      'Informations Personnelles','Coordonnées','Emploi',
+      'Prêt & EMI','Banque','Documents','Références','Récapitulatif'
+    ];
+
+    /* Build progress track */
+    const track = document.getElementById('progress-track');
+    for (let i = 1; i <= STEPS; i++) {
+      const seg = document.createElement('div');
+      seg.className = 'progress-seg' + (i === 1 ? ' active' : '');
+      seg.id = `seg-${i}`;
+      track.appendChild(seg);
+    }
+
+    function updateProgress(step) {
+      for (let i = 1; i <= STEPS; i++) {
+        const seg = document.getElementById(`seg-${i}`);
+        seg.className = 'progress-seg' + (i < step ? ' done' : i === step ? ' active' : '');
+      }
+      document.getElementById('step-current').textContent = step;
+      document.getElementById('step-label-meta').textContent = STEP_LABELS[step-1];
+      document.getElementById('btn-prev').disabled = step === 1;
+      const btnNext = document.getElementById('btn-next');
+      if (step === STEPS) {
+        btnNext.textContent = 'Soumettre';
+        btnNext.className = 'btn btn-success';
+      } else {
+        btnNext.innerHTML = 'Suivant <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>';
+        btnNext.className = 'btn btn-primary';
+      }
+    }
+
+    function showStep(step) {
+      document.querySelectorAll('.wizard-step-view').forEach(v => v.classList.remove('active'));
+      document.getElementById(`step-view-${step}`).classList.add('active');
+      updateProgress(step);
+      if (step === STEPS) buildSummary();
+    }
+
+    /* ── Validation Map ─────────────────────────────── */
+    const validators = {
+      1: () => {
+        const errs = [];
+        if (!v('ls-fname'))   errs.push(['err-fname','ls-fname']);
+        if (!v('ls-lname'))   errs.push(['err-lname','ls-lname']);
+        if (!v('ls-dob'))     errs.push(['err-dob','ls-dob']);
+        const aadhaar = document.getElementById('ls-aadhaar').value.replace(/\s/g,'');
+        if (aadhaar.length !== 12 || !Verhoeff.validate(aadhaar)) errs.push(['err-aadhaar','ls-aadhaar']);
+        const pan = document.getElementById('ls-pan').value;
+        if (!/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(pan.toUpperCase())) errs.push(['err-pan','ls-pan']);
+        if (!v('ls-gender'))  errs.push(['err-gender','ls-gender']);
+        return errs;
+      },
+      2: () => {
+        const errs = [];
+        const em = document.getElementById('ls-email').value;
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) errs.push(['err-email','ls-email']);
+        if (!v('ls-phone')) errs.push(['err-phone','ls-phone']);
+        if (!v('ls-addr'))  errs.push(['err-addr','ls-addr']);
+        if (!v('ls-city'))  errs.push(['err-city','ls-city']);
+        if (!/^\d{4,8}$/.test(document.getElementById('ls-pin').value)) errs.push(['err-pin','ls-pin']);
+        return errs;
+      },
+      3: () => {
+        const errs = [];
+        if (!v('ls-emp-status')) errs.push(['err-emp-status','ls-emp-status']);
+        if (!v('ls-employer'))   errs.push(['err-employer','ls-employer']);
+        if (!v('ls-sector'))     errs.push(['err-sector','ls-sector']);
+        if (!v('ls-income') || +document.getElementById('ls-income').value < 1000) errs.push(['err-income','ls-income']);
+        return errs;
+      },
+      4: () => {
+        const errs = [];
+        if (!v('ls-amount'))  errs.push(['err-amount','ls-amount']);
+        if (!v('ls-tenure'))  errs.push(['err-tenure','ls-tenure']);
+        if (!v('ls-rate'))    errs.push(['err-rate','ls-rate']);
+        if (!v('ls-purpose')) errs.push(['err-purpose','ls-purpose']);
+        return errs;
+      },
+      5: () => {
+        const errs = [];
+        if (!v('ls-bank'))    errs.push(['err-bank','ls-bank']);
+        if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(document.getElementById('ls-ifsc').value.toUpperCase()) &&
+            !/^[A-Z0-9]{8,11}$/.test(document.getElementById('ls-ifsc').value.toUpperCase()))
+          errs.push(['err-ifsc','ls-ifsc']);
+        const acc = document.getElementById('ls-account').value;
+        if (!/^\d{8,18}$/.test(acc)) errs.push(['err-account','ls-account']);
+        if (!v('ls-acctype')) errs.push(['err-acctype','ls-acctype']);
+        return errs;
+      },
+      6: () => [], // File uploads: soft validation
+      7: () => {
+        const errs = [];
+        if (!v('ls-ref1name'))  errs.push(['err-ref1name','ls-ref1name']);
+        if (!v('ls-ref1rel'))   errs.push(['err-ref1rel','ls-ref1rel']);
+        if (!v('ls-ref1phone')) errs.push(['err-ref1phone','ls-ref1phone']);
+        if (!v('ls-ref2name'))  errs.push(['err-ref2name','ls-ref2name']);
+        if (!v('ls-ref2rel'))   errs.push(['err-ref2rel','ls-ref2rel']);
+        if (!v('ls-ref2phone')) errs.push(['err-ref2phone','ls-ref2phone']);
+        return errs;
+      },
+      8: () => {
+        if (!document.getElementById('ls-consent').checked) {
+          alert('Veuillez accepter les conditions pour soumettre votre demande.');
+          return [['dummy','ls-consent']];
+        }
+        return [];
+      }
+    };
+
+    function v(id) {
+      const el = document.getElementById(id);
+      return el && el.value.trim() !== '' && el.value !== '';
+    }
+
+    function clearErrors() {
+      document.querySelectorAll('.form-error.show').forEach(e => e.classList.remove('show'));
+      document.querySelectorAll('.form-input.error').forEach(e => e.classList.remove('error'));
+    }
+
+    function showErrors(errs) {
+      errs.forEach(([errId, inputId]) => {
+        const err = document.getElementById(errId);
+        const inp = document.getElementById(inputId);
+        if (err) err.classList.add('show');
+        if (inp) inp.classList.add('error');
+      });
+      if (errs.length) {
+        const inp = document.getElementById(errs[0][1]);
+        if (inp) inp.focus();
+      }
+    }
+
+    /* Snapshot current step data into formData */
+    async function captureStep(step) {
+      const inputs = document.querySelectorAll(`#step-view-${step} [id^="ls-"]`);
+      for (const inp of inputs) {
+        if (inp.type === 'file') continue;
+        const raw = inp.value;
+        if (raw) {
+          try { formData[inp.id] = await CryptoEngine.encrypt(raw); }
+          catch { formData[inp.id] = raw; }
+        }
+      }
+    }
+
+    window.wizardNext = async function() {
+      clearErrors();
+      const errs = validators[currentStep]?.() ?? [];
+      if (errs.length) { showErrors(errs); return; }
+      await captureStep(currentStep);
+      if (currentStep === STEPS) {
+        handleSubmit();
+        return;
+      }
+      currentStep++;
+      showStep(currentStep);
+    };
+
+    window.wizardPrev = function() {
+      if (currentStep > 1) { currentStep--; showStep(currentStep); }
+    };
+
+    /* ── Summary Builder ─────────────────────────────── */
+    async function buildSummary() {
+      const tbody = document.getElementById('summary-tbody');
+      tbody.innerHTML = '';
+      const LABELS = {
+        'ls-fname':'Prénom', 'ls-lname':'Nom', 'ls-dob':'Date de naissance',
+        'ls-aadhaar':'Aadhaar', 'ls-pan':'PAN', 'ls-gender':'Genre',
+        'ls-email':'Email', 'ls-phone':'Téléphone', 'ls-city':'Ville',
+        'ls-emp-status':'Emploi', 'ls-income':'Revenu mensuel',
+        'ls-amount':'Montant prêt', 'ls-tenure':'Durée', 'ls-rate':'Taux',
+        'ls-purpose':'Objet', 'ls-bank':'Banque',
+        'ls-ref1name':'Référence 1', 'ls-ref2name':'Référence 2'
+      };
+      for (const [key, label] of Object.entries(LABELS)) {
+        if (!formData[key]) continue;
+        let val;
+        try { val = await CryptoEngine.decrypt(formData[key]); }
+        catch { val = formData[key]; }
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${label}</td><td>${val}</td>`;
+        tbody.appendChild(tr);
+      }
+    }
+
+    function handleSubmit() {
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(6,6,14,.95);display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:24px;';
+      overlay.innerHTML = `
+        <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5" aria-hidden="true" style="animation:pulse 1.5s ease infinite">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>
+        </svg>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:3px;color:#22c55e;">Demande Soumise</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.5);text-align:center;max-width:400px;line-height:1.7;">
+          Votre dossier a été chiffré AES-256-GCM et transmis avec succès.<br/>
+          Référence : <strong style="color:var(--g1);font-family:'JetBrains Mono',monospace">LS-${Date.now().toString(36).toUpperCase()}</strong>
+        </div>
+        <a href="index.html" style="margin-top:8px;display:inline-flex;align-items:center;gap:8px;padding:12px 28px;background:linear-gradient(135deg,#c8a951,#b8922e);color:#06060e;font-size:10px;letter-spacing:3px;text-transform:uppercase;text-decoration:none;font-weight:600;border-radius:4px;">
+          Retour au portfolio
+        </a>`;
+      document.body.appendChild(overlay);
+    }
+
+    /* ── EMI Live Update ─────────────────────────────── */
+    window.updateEmi = function() {
+      const amount  = +document.getElementById('ls-amount')?.value || 0;
+      const tenure  = +document.getElementById('ls-tenure')?.value || 0;
+      const rate    = +document.getElementById('ls-rate')?.value   || 0;
+      const income  = +document.getElementById('ls-income')?.value || 0;
+
+      if (!amount || !tenure || !rate) return;
+      const res = EMI.calc(amount, rate, tenure);
+      if (!res) return;
+
+      const fmt = n => n.toLocaleString('fr-FR');
+      document.getElementById('emi-result').textContent   = `${fmt(res.emi)} MAD`;
+      document.getElementById('emi-interest').textContent = `${fmt(res.interest)} MAD`;
+      document.getElementById('emi-total').textContent    = `${fmt(res.total)} MAD`;
+
+      const pct = Math.min(100, (res.interest / res.total) * 100);
+      document.getElementById('emi-bar-fill').style.width = `${pct}%`;
+
+      const badge = document.getElementById('foir-badge');
+      if (income) {
+        const foir = EMI.foirStatus(res.emi, income);
+        badge.className = `foir-badge foir-${foir.level}`;
+        badge.style.display = 'inline-flex';
+        badge.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> ${foir.label}`;
+      } else {
+        badge.style.display = 'none';
+      }
+    };
+
+    /* ── Aadhaar Live Validation ─────────────────────── */
+    document.getElementById('ls-aadhaar')?.addEventListener('input', function() {
+      const raw = this.value.replace(/\D/g,'');
+      this.value = raw.replace(/(\d{4})(?=\d)/g,'$1 ').trim();
+      const badge = document.getElementById('verhoeff-badge');
+      if (raw.length === 12) {
+        const ok = Verhoeff.validate(raw);
+        badge.className = `verhoeff-badge show ${ok ? 'verhoeff-ok' : 'verhoeff-err'}`;
+        document.getElementById('verhoeff-text').textContent = ok ? '✓ Checksum Verhoeff validée' : '✗ Checksum invalide';
+        this.classList.toggle('success', ok);
+        this.classList.toggle('error', !ok);
+      } else {
+        badge.className = 'verhoeff-badge';
+      }
+    });
+
+    /* ── File Upload + Canvas Compression ─────────────── */
+    window.handleFileUpload = async function(type, input) {
+      const file = input.files[0];
+      if (!file) return;
+      const statusEl = document.getElementById(`upload-status-${type}`);
+      statusEl.textContent = 'Traitement en cours…';
+      statusEl.classList.add('show');
+      const compressed = await compressImage(file);
+      const kb = (compressed.size / 1024).toFixed(0);
+      const wasCompressed = compressed !== file;
+      statusEl.textContent = `✓ ${file.name} · ${kb} Ko${wasCompressed ? ' (compressé)' : ''}`;
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          formData[`file_${type}`] = await CryptoEngine.encrypt(reader.result.slice(0,80));
+        } catch {}
+      };
+      reader.readAsDataURL(compressed);
+    };
+
+    /* ── Intersection Observer for .rev animations ─── */
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.rev').forEach(el => io.observe(el));
+
+    /* Init */
+    showStep(1);
+  </script>
+</body>
+</html>
